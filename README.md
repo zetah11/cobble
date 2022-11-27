@@ -6,9 +6,9 @@ textures are created from a directed acyclic graph of nodes, which can either
 generate, modify, or combine other textures. primitivies such as voronoi,
 simplex, convolutions, and mixes are provided.
 
-    a := voronoi(50) -> invert
-    b := voronoi(20)
-    c := (a, b) -> math(Multiply)
+    a = voronoi(50) -> invert
+    b = voronoi(20)
+    c = (a, b) -> math(Multiply)
     
     (c, random) -> mix -> return
 
