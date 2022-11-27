@@ -1,19 +1,15 @@
 program     = *statement
 
-statement   = pipeline / definition
-
-definition  = IDENT "=" pipeline
+statement   = [IDENT "="] pipeline
 
 pipeline    = [pipeline "->"] base-expr
-base-expr   = (IDENT) [args] [options]
-base-expr  =/ "(" [base-expr *("," base-expr) [","]] ")"
 
-args        = "(" [value *("," value) [","]] ")"
-options     = "{" [pair *("," pair) [","]] "}"
+base-expr   = IDENT [args]
+base-expr  =/ NUMBER / SYMBOL
+base-expr  =/ args
 
-pair        = IDENT "=" value
-value       = NUMBER / SYMBOL
+args        = "(" [statement *("," statement) [","]] ")"
 
-SYMBOL      = /[A-Z][a-zA-Z0-9_']*/
 IDENT       = /[a-z][a-zA-Z0-9_']*/
-NUMBER      = /[+\-]?[0-9][0-9_']*(\.[0-9][0-9_']*)?([eE][+\-]?[0-9][0-9_']*)?/
+NUMBER      = /[+\-]?[0-9][0-9_']*(\.[0-9][0-9_']*)?([eE][+\-]?[0-9][0-9_']*)?%?/
+SYMBOL      = /[A-Z][a-zA-Z0-9_']*/

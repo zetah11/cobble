@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::ops::Range;
+use std::ops::{Add, Range};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct SourceId(usize);
@@ -17,6 +17,19 @@ impl Span {
             start: range.start,
             end: range.end,
             file: id,
+        }
+    }
+}
+
+impl Add for Span {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        assert!(self.file == rhs.file);
+        Self {
+            start: self.start.min(rhs.start),
+            end: self.end.max(rhs.end),
+            file: self.file,
         }
     }
 }

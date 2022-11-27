@@ -17,7 +17,7 @@ pub enum Token<'src> {
     #[regex(r"[A-Z][a-zA-Z0-9_']*", |lex| lex.slice())]
     Symbol(&'src str),
 
-    #[regex(r"[+\-]?[0-9][0-9_']*(\.[0-9][0-9_']*)?([eE][+\-]?[0-9][0-9_']*)?", |lex| lex.slice())]
+    #[regex(r"[+\-]?[0-9][0-9_']*(\.[0-9][0-9_']*)?([eE][+\-]?[0-9][0-9_']*)?%?", |lex| lex.slice())]
     Number(&'src str),
 
     #[token("(")]
@@ -25,12 +25,6 @@ pub enum Token<'src> {
 
     #[token(")")]
     CloseParen,
-
-    #[token("{")]
-    OpenBrace,
-
-    #[token("}")]
-    CloseBrace,
 
     #[token(",")]
     Comma,
@@ -63,7 +57,7 @@ mod tests {
 
     #[test]
     fn lex_basic() {
-        let source = "a aASH912_''1'231 Sy_'1 123 12.3 12e3 1.2e+3 -123e-123";
+        let source = "a aASH912_''1'231 Sy_'1 123 12.3 12e3 1.2e+3 -123e-123 +50.123e+131%";
         let expected = &[
             Token::Ident("a"),
             Token::Ident("aASH912_''1'231"),
@@ -73,6 +67,7 @@ mod tests {
             Token::Number("12e3"),
             Token::Number("1.2e+3"),
             Token::Number("-123e-123"),
+            Token::Number("+50.123e+131%"),
         ];
 
         test_tokens(expected, source);
@@ -80,12 +75,10 @@ mod tests {
 
     #[test]
     fn lex_other() {
-        let source = "({)},=->ø";
+        let source = "(),=->ø";
         let expected = &[
             Token::OpenParen,
-            Token::OpenBrace,
             Token::CloseParen,
-            Token::CloseBrace,
             Token::Comma,
             Token::Equal,
             Token::Pipe,
