@@ -105,6 +105,10 @@ impl ErrorAdder<'_> {
         );
     }
 
+    pub fn repeated_name_init(&mut self) {
+        self.add(Error::new(self.span, "named argument repeated"));
+    }
+
     pub fn unclosed_paren(&mut self) {
         self.add(Error::new(self.span, "unclosed group"));
     }

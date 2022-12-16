@@ -128,7 +128,9 @@ impl<'a> Transformer<'a> {
                     };
 
                     if let Some(value) = self.make_value(*value) {
-                        named.insert(name, (name_span, value));
+                        if named.insert(name, (name_span, value)).is_some() {
+                            self.errors.at(ast.1).repeated_name_init();
+                        }
                     }
                 }
 

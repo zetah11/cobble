@@ -30,7 +30,7 @@ pub enum Node<'src> {
     Invalid,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Value<'src> {
     Number(&'src str),
     Symbol(&'src str),

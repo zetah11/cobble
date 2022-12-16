@@ -2,11 +2,37 @@ use std::collections::{HashMap, HashSet};
 
 use bimap::BiMap;
 
+use super::tree::Value;
+
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NodeId(usize);
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct Node<'name>(pub &'name str);
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct Node<'name>(
+    &'name str,
+    Vec<Value<'name>>,
+    Vec<(&'name str, Value<'name>)>,
+);
+
+impl<'name> Node<'name> {
+    pub fn simple(name: &'name str) -> Self {
+        Self(name, vec![], vec![])
+    }
+
+    pub fn with_args(
+        name: &'name str,
+        positional: Vec<Value<'name>>,
+        kw: impl IntoIterator<Item = (&'name str, Value<'name>)>,
+    ) -> Self {
+        // Because nodes may be hashed to maximize reuse, their kwargs are
+        // reordered into a "canonical" order. Here, that order is just sorted
+        // by their name, and since the same name should never pop up twice, any
+        // (un)stability issues are irrelevant.
+        let mut kw: Vec<_> = kw.into_iter().collect();
+        kw.sort_by_key(|(name, _)| *name);
+        Self(name, positional, kw)
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct Graph<'name> {

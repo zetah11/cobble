@@ -17,7 +17,7 @@ struct Resolver<'src> {
     graph: Graph<'src>,
 
     cycles: HashSet<&'src str>,
-    names: HashMap<&'src str, NodeId>,
+    names: HashMap<&'src str, Vec<NodeId>>,
 }
 
 impl<'src> Resolver<'src> {
@@ -63,34 +63,56 @@ impl<'src> Resolver<'src> {
         resolver.graph
     }
 
-    fn resolve_pipeline(&mut self, pipeline: tree::Pipeline<'src>) -> NodeId {
-        let mut result = None;
+    fn resolve_pipeline(&mut self, pipeline: tree::Pipeline<'src>) -> Vec<NodeId> {
+        let mut result = vec![];
 
         for node in pipeline.nodes {
-            let id = self.resolve_node(node.0);
+            let ids = self.resolve_node(node.0);
 
-            if let Some(prev) = result {
-                self.graph.add_edge(prev, id);
+            for from in result {
+                for to in ids.iter() {
+                    self.graph.add_edge(from, *to);
+                }
             }
 
-            result = Some(id);
+            result = ids;
         }
 
-        result.unwrap()
+        result
     }
 
-    fn resolve_node(&mut self, node: tree::Node<'src>) -> NodeId {
+    fn resolve_node(&mut self, node: tree::Node<'src>) -> Vec<NodeId> {
         match node {
-            tree::Node::Init { .. } => todo!(),
-            tree::Node::Invalid => self.graph.add_node(Node("invalid")),
-            tree::Node::Name(name) if self.cycles.contains(&name) => {
-                self.graph.add_node(Node("invalid"))
+            tree::Node::Init {
+                name,
+                named,
+                positional,
+            } => {
+                let positional = positional.into_iter().map(|(value, _)| value).collect();
+                let named = named
+                    .into_iter()
+                    .map(|(name, (_, (value, _)))| (name, value));
+
+                vec![self
+                    .graph
+                    .add_node(Node::with_args(name.0, positional, named))]
             }
+
+            tree::Node::Invalid => vec![self.graph.add_node(Node::simple("invalid"))],
+
+            tree::Node::Name(name) if self.cycles.contains(&name) => {
+                vec![self.graph.add_node(Node::simple("invalid"))]
+            }
+
             tree::Node::Name(name) => match self.names.get(&name) {
-                Some(id) => *id,
-                None => self.graph.add_node(Node(name)),
+                Some(ids) => ids.clone(),
+                None => vec![self.graph.add_node(Node::simple(name))],
             },
-            tree::Node::Tuple(_) => todo!(),
+
+            tree::Node::Tuple(pipes) => pipes
+                .into_iter()
+                .flat_map(|(pipe, _)| self.resolve_pipeline(pipe))
+                .collect(),
         }
     }
 }
