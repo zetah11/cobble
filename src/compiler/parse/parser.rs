@@ -1,6 +1,6 @@
 use super::ast::{Ast, Spanned};
-use crate::compiler::error::Errors;
 use crate::compiler::token::Token;
+use crate::compiler::Errors;
 
 #[derive(Debug)]
 pub struct Parser<'src, 'a, I> {
@@ -145,16 +145,20 @@ where
                 (Ast::Init(Box::new(name), args), span)
             }
         } else {
-            let args = self.args();
-            let span = args
-                .iter()
-                .map(|(_, span)| *span)
-                .reduce(|a, b| a + b)
-                .or_else(|| self.prev.as_ref().map(|(_, span)| *span))
-                .or_else(|| self.curr.as_ref().map(|(_, span)| *span))
-                .unwrap();
+            let mut args = self.args();
 
-            (Ast::Tuple(args), span)
+            if args.len() == 1 {
+                args.remove(0)
+            } else {
+                let span = args
+                    .iter()
+                    .map(|(_, span)| *span)
+                    .reduce(|a, b| a + b)
+                    .or_else(|| self.prev.as_ref().map(|(_, span)| *span))
+                    .or_else(|| self.curr.as_ref().map(|(_, span)| *span))
+                    .unwrap();
+                (Ast::Tuple(args), span)
+            }
         }
     }
 

@@ -14,6 +14,4 @@ pub enum Ast<'src> {
     Name(&'src str),
     Number(&'src str),
     Symbol(&'src str),
-
-    Invalid,
 }

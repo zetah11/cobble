@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.66"
+bimap = "0.6.2"
 colorsys = "0.6.6"
 image = "0.24.5"
 lab = "0.11.0"

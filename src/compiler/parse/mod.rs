@@ -1,12 +1,29 @@
 mod ast;
 mod parser;
+mod transform;
+
+use super::Errors;
+use crate::compiler::source::Span;
+use crate::compiler::token::Token;
+use crate::compiler::tree::Program;
+
+pub fn parse<'src, I>(tokens: I, errors: &mut Errors) -> Program<'src>
+where
+    I: Iterator<Item = (Token<'src>, Span)>,
+{
+    let mut parser = parser::Parser::new(tokens, errors);
+    let program = parser.parse();
+
+    let mut transformer = transform::Transformer::new(errors);
+    transformer.make_program(program)
+}
 
 #[cfg(test)]
 mod test {
     use super::parser::Parser;
-    use crate::compiler::error::Errors;
     use crate::compiler::source::Sources;
     use crate::compiler::token::lex;
+    use crate::compiler::Errors;
 
     #[test]
     fn parser_halts_on_success() {
