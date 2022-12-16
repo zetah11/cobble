@@ -173,6 +173,6 @@ fn map_u8(byte: u8) -> f64 {
 
 /// Translate a value clamped to the `[0, 1]` range into a byte `[0, 255]`.
 fn map_f64_sat(value: f64) -> u8 {
-    let value = value.max(0.0).min(1.0);
+    let value = value.clamp(0.0, 1.0);
     (value * 255.0).round() as u8
 }
