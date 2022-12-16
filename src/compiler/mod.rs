@@ -8,3 +8,9 @@ pub mod tree;
 mod error;
 
 pub use error::{Error, Errors};
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub enum Value<'src> {
+    Number(&'src str),
+    Symbol(&'src str),
+}

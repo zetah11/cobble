@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use super::Value;
 use crate::compiler::source::Span;
 
 pub type Spanned<T> = (T, Span);
@@ -28,10 +29,4 @@ pub enum Node<'src> {
     Tuple(Vec<Spanned<Pipeline<'src>>>),
 
     Invalid,
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum Value<'src> {
-    Number(&'src str),
-    Symbol(&'src str),
 }

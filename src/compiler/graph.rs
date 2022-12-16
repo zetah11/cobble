@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use bimap::BiMap;
 
-use super::tree::Value;
+use super::Value;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NodeId(usize);

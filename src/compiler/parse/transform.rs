@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use super::ast::Ast;
-use crate::compiler::tree::{Node, Pipeline, Program, Spanned, Value};
-use crate::compiler::Errors;
+use crate::compiler::tree::{Node, Pipeline, Program, Spanned};
+use crate::compiler::{Errors, Value};
 
 #[derive(Debug)]
 pub struct Transformer<'a> {
